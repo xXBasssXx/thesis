@@ -18,15 +18,15 @@ def getBP():
             if ser.in_waiting > 0:
                 c = ser.read().decode('utf-8')
                 
-                if(c[0] <= 120 && c[1] <= 80):
+                if(c[0] <= 120 and c[1] <= 80):
                     classification = "Normal"
-                elif((c[0] > 120 && c[0] <= 140) && (c[1] > 80 && c[1] <= 90)):
+                elif((c[0] > 120 and c[0] <= 140) and (c[1] > 80 and c[1] <= 90)):
                     classification = "Pre-hypertension"
-                elif((c[0] > 140 && c[0] <= 160) && (c[1] > 90 && c[1] <= 99)):
+                elif((c[0] > 140 and c[0] <= 160) and (c[1] > 90 and c[1] <= 99)):
                     classification = "Stage 1 Hypertension"
                 else:
                     classification = "Stage 2 Hypertension"
-                return [c, classification]
+                return [c[0], c[1], classification]
 
     # send string to serial port
     def send_string(string):

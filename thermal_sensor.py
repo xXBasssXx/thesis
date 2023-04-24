@@ -62,7 +62,7 @@ def getTemperature():
 
     avg_temperature = sum(temperature_list) / len(temperature_list)
     print("{:.2f}°C".format(avg_temperature))
-    if(avg_temperature >= 33 && avg_temperature < 37):
+    if(avg_temperature >= 33 and avg_temperature < 37):
         classification = "Normal"
     else:
         classification = "Not Normal Temperature"

@@ -6,9 +6,9 @@ from datetime import date
 import psycopg2
 from tkcalendar import DateEntry
 import sms
-# import thermal_sensor as ts
-# import hr_or
-# import bp
+import thermal_sensor as ts
+import hr_or
+import bp
 
 #initial data
 global bp_sys, bp_dys, temp, hr, ox_r
@@ -17,6 +17,11 @@ bp_dys = 0
 temp = 0
 hr = 0
 ox_r = 0
+global bp_classification, temp_classification, hr_classification, or_classification
+bp_classification = ""
+temp_classification = ""
+hr_classification = ""
+or_classification = ""
 now = datetime.now()
 format_date = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -258,7 +263,7 @@ def main_page():
             conn.close()
 
         global main
-        main = tk.Tk()
+        global bp_classification, temp_classification, hr_classification, or_classification
         main.title("Main Page")
         main.resizable(0,0)
         main.configure(background="#0583D2")
@@ -315,15 +320,15 @@ def main_page():
         #format_date = now.strftime("%d/%m/%Y %H:%M:%S")
         date_time = tk.Label(vital_signs, text=format_date, background="#98C1D9", font=("Arial", 10))
         date_time.grid(row=0, column=1, padx=3, sticky="N")
-        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n Normal", background="#ee6c4d", font=("Arial", 12), width=15)
+        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n {bp_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
         blood_pressure.grid(row=0, column=0, padx=50, pady=73)
-        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n Normal", background="#ee6c4d", font=("Arial", 12), width=15)
+        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n {temp_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
         body_temp.grid(row=1, column=0, padx=50, pady=73)
         
-        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n Normal", background="#ee6c4d", font=("Arial", 12), width=15)
+        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n {hr_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
         heart_rate.grid(row=0, column=1, padx=90, pady=73)
 
-        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n Normal", background="#ee6c4d", font=("Arial", 12), width=15)
+        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n {or_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
         oxygen.grid(row=1, column=1, padx=90, pady=73)
 
         main.mainloop()
@@ -331,9 +336,10 @@ def main_page():
 def check_vitals():
     try:
         global bp_sys, bp_dys, temp, hr, ox_r
-#         temp = ts.getTemperature()
-#         [hr, ox_r] = hr_or.getReadings()
-#         [bp_sys, bp_dys] = bp.getBP()
+        global bp_classification, temp_classification, hr_classification, or_classification
+        [temp, temp_classification] = ts.getTemperature()
+        [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
+        [bp_sys, bp_dys, bp_classification] = bp.getBP()
         print("niari diri")
         conn = accessDB()
         patient = conn.cursor()
