@@ -39,7 +39,6 @@ def step(progress_bar):
     progress_bar.start(10)
 
 def getTemperature():
-    classification = ""
     root = createRoot()
     progress_bar = progressBar(root)
     step(progress_bar)
@@ -62,10 +61,10 @@ def getTemperature():
 
     avg_temperature = sum(temperature_list) / len(temperature_list)
     print("{:.2f}°C".format(avg_temperature))
-    if(avg_temperature >= 33 && avg_temperature < 37):
-        classification = "Normal"
-    else:
-        classification = "Not Normal Temperature"
-    return ["{:.2f}".format(avg_temperature), classification]
+    return "{:.2f}°C".format(avg_temperature)
 
-
+if __name__ == "__main__":
+    try:
+        getTemperature()
+    except KeyboardInterrupt:
+        bus.close()

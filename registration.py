@@ -5,9 +5,10 @@ from datetime import datetime
 from datetime import date
 import psycopg2
 from tkcalendar import DateEntry
-#import sms
-#import thermal_sensor as ts
-
+import sms
+# import thermal_sensor as ts
+# import hr_or
+# import bp
 
 #initial data
 global bp_sys, bp_dys, temp, hr, ox_r
@@ -84,6 +85,12 @@ def createVitalsTable():
         conn.close()
 
 def login_page():
+    bp_sys = 0
+    bp_dys = 0
+    temp = 0
+    hr = 0
+    ox_r = 0
+    
     login = tk.Tk()
     login.title("Login Page")
     login.resizable(0,0)
@@ -324,11 +331,9 @@ def main_page():
 def check_vitals():
     try:
         global bp_sys, bp_dys, temp, hr, ox_r
-        bp_sys = 120
-        bp_dys = 80
-        #temp = ts.getTemperature()
-        hr = 80
-        ox_r = 95
+#         temp = ts.getTemperature()
+#         [hr, ox_r] = hr_or.getReadings()
+#         [bp_sys, bp_dys] = bp.getBP()
         print("niari diri")
         conn = accessDB()
         patient = conn.cursor()
@@ -339,13 +344,14 @@ def check_vitals():
         
         patient.execute('''SELECT * FROM Patient WHERE patient_id = %s''', [pat_id_check])
         vitals.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s''', [pat_id_check])
-        infoPatient = patient.fetchone()
-        infoVitals = vitals.fetchone()
+        infoPatient = patient.fetchall()
+        infoVitals = vitals.fetchall()
+        
         
         conn.commit()
         conn.close()
-        print(infoPatient[5] + infoPatient[6])
-        #sms.send_alert(infoPatient[5], infoPatient[6], infoPatient[0], infoVitals[3], infoVitals[5], infoVitals[4], infoVitals[1], infoVitals[2])
+        #print(infoPatient[-1] + infoVitals[-1])
+        sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
         global main
         main.destroy()
         main_page()
@@ -418,7 +424,7 @@ def history_page():
 
         # Add pagination buttons
         tk.Button(history, text="Prev", height=1, width=8, font=("Arial", 10), background="#ee6c4d", command=prev_page).place(x=10, y=410)
-        tk.Button(history, text="Next", height=1, width=8, font=("Arial", 10), background="#ee6c4d", command=next_page).place(x=660, y=410)
+        tk.Button(history, text="Next", height=1, width=8, font=("Arial", 10), background="#ee6c4d", command=next_page).place(x=650, y=410)
 
         # Show first page
         update_table()
@@ -427,7 +433,7 @@ def history_page():
             history.destroy()
             main_page()
 
-        tk.Button(history, text="BACK", height=1, width=10, font=("Arial", 10), background="#ee6c4d", command=back_to_main).place(x=360, y=410)
+        tk.Button(history, text="BACK", height=1, width=10, font=("Arial", 10), background="#ee6c4d", command=back_to_main).place(x=330, y=410)
     except:
         messagebox.showwarning("Warning", "Exception Failed")
 if __name__ == "__main__":
