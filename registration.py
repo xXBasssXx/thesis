@@ -18,10 +18,10 @@ temp = 0
 hr = 0
 ox_r = 0
 global bp_classification, temp_classification, hr_classification, or_classification
-bp_classification = ""
-temp_classification = ""
-hr_classification = ""
-or_classification = ""
+bp_classification = "-"
+temp_classification = "-"
+hr_classification = "-"
+or_classification = "-"
 now = datetime.now()
 format_date = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -90,11 +90,6 @@ def createVitalsTable():
         conn.close()
 
 def login_page():
-    bp_sys = 0
-    bp_dys = 0
-    temp = 0
-    hr = 0
-    ox_r = 0
     
     login = tk.Tk()
     login.title("Login Page")
@@ -141,15 +136,15 @@ def login_page():
 
     #patient ID
     global patient_id
-    tk.Label(login, text="Patient ID:", background="#0583D2", font=("Arial", 15)).place(x=26, y=80)
-    patient_id = tk.Entry(login, justify="left", width=20, font=("Arial", 14))
-    patient_id.place(x=30, y=110)
+    tk.Label(login, text="Patient ID:", background="#0583D2", font=("Arial", 17)).place(x=26, y=80)
+    patient_id = tk.Entry(login, justify="left", width=19, font=("Arial", 16))
+    patient_id.place(x=25, y=110)
     patient_id.focus_set()
 
     #Login Button
-    tk.Button(login, text="LOGIN", height=2, width=18, font=("Arial", 13), background="#ee6c4d", command=login_fun).place(x=30, y=145)
+    tk.Button(login, text="LOGIN", height=2, width=18, font=("Arial", 15), background="#ee6c4d", command=login_fun).place(x=30, y=145)
     #Register Button
-    tk.Button(login, text="Register", height=2, width=18, font=("Arial", 13), background="#293241", fg="white", command=register).place(x=30, y=200)    
+    tk.Button(login, text="Register", height=2, width=18, font=("Arial", 15), background="#293241", fg="white", command=register).place(x=30, y=200)    
     login.mainloop()
 
 def registration_page():
@@ -206,44 +201,44 @@ def registration_page():
     registration.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x)}')
 
     #title
-    tk.Label(registration, text="Personal Information", background="#0583D2", font=("Arial", 20, "bold")).place(x=35, y=5)
+    tk.Label(registration, text="Personal Information", background="#0583D2", font=("Arial", 22, "bold")).place(x=35, y=5)
 
     #first name
     global first_name
-    tk.Label(registration, text="First Name:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=60)
-    first_name = tk.Entry(registration, justify="left", width=25, font=("Arial", 13), background="#D3D3D3")
+    tk.Label(registration, text="First Name:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=60)
+    first_name = tk.Entry(registration, justify="left", width=25, font=("Arial", 15), background="#D3D3D3")
     first_name.place(x=24, y=85)
     first_name.focus_set()
     #last name
     global last_name
-    tk.Label(registration, text="Last Name:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=110)
-    last_name = tk.Entry(registration, justify="left", width=25, font=("Arial", 13), background="#D3D3D3")
+    tk.Label(registration, text="Last Name:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=110)
+    last_name = tk.Entry(registration, justify="left", width=25, font=("Arial", 15), background="#D3D3D3")
     last_name.place(x=24, y=135)
 
     today = date.today()
     max_year = today.year
     max_date = date(max_year, 12, 31)
     global age
-    tk.Label(registration, text="Age:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=160)
-    age = DateEntry(registration, date_pattern='yyyy-mm-dd', width=12, background="#D3D3D3", font=("Arial", 13), maxdate=max_date)
+    tk.Label(registration, text="Age:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=160)
+    age = DateEntry(registration, date_pattern='yyyy-mm-dd', width=12, background="#D3D3D3", font=("Arial", 15), maxdate=max_date)
     age.place(x=24, y=185)
     #address
     global address
-    tk.Label(registration, text="Address:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=210)
-    address = tk.Entry(registration, justify="left", width=25, font=("Arial", 13), background="#D3D3D3")
+    tk.Label(registration, text="Address:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=210)
+    address = tk.Entry(registration, justify="left", width=25, font=("Arial", 15), background="#D3D3D3")
     address.place(x=24, y=235)
     #doctors contact
     global doc_num
-    tk.Label(registration, text="Doctor's Number:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=260)
-    doc_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 13), background="#D3D3D3")
+    tk.Label(registration, text="Doctor's Number:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=260)
+    doc_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 15), background="#D3D3D3")
     doc_num.place(x=24, y=285)
     #relative contact
     global relative_num
-    tk.Label(registration, text="Relative's Number:", background="#0583D2", font=("Arial", 14), foreground="#FFFFFF").place(x=20, y=310)
-    relative_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 13), background="#D3D3D3")
+    tk.Label(registration, text="Relative's Number:", background="#0583D2", font=("Arial", 16), foreground="#FFFFFF").place(x=20, y=310)
+    relative_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 15), background="#D3D3D3")
     relative_num.place(x=24, y=335)
     #Register Button
-    tk.Button(registration, text="REGISTER", height=2, width=24, font=("Arial", 13), background="#ee6c4d", command=check_exceptions).place(x=40, y=380)
+    tk.Button(registration, text="REGISTER", height=2, width=24, font=("Arial", 15), background="#ee6c4d", command=check_exceptions).place(x=40, y=380)
 
     registration.mainloop()
 
@@ -264,72 +259,79 @@ def main_page():
 
         global main
         global bp_classification, temp_classification, hr_classification, or_classification
+        main = tk.Tk()
         main.title("Main Page")
         main.resizable(0,0)
         main.configure(background="#0583D2")
 
-        appHeight = 445
-        appWidth = 742
+        appHeight = 535
+        appWidth = 1015
 
         screenHeight = main.winfo_screenheight()
         screenWidth = main.winfo_screenwidth()
 
         x = (screenHeight / 2) - (appHeight / 2)
         y = (screenWidth / 2) - (appWidth / 2)
-        main.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x) - 20}')
+        main.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x) + 5}')
         def goto_history():
             main.destroy()
             history_page()
-        pf = tk.LabelFrame(main, text="Patient's Profile", background="#293241", fg="#e0fbfc", font=("Arial", 16))
-        pf.grid(row=0, column=0, padx=1, pady=2)
+        pf = tk.LabelFrame(main, text="Patient's Profile", background="#293241", fg="#e0fbfc", font=("Arial", 18))
+        pf.grid(row=0, column=0, padx=1, pady=2, sticky="NW")
 
-        name = tk.Label(pf, text="Name: {0} {1}".format(info[1], info[2]), background="#293241", fg="#e0fbfc", font=("Arial", 10))
-        name.grid(row=0, column=0, padx=0, pady=4, sticky="W")
+        name = tk.Label(pf, text="Name: {0} {1}".format(info[1], info[2]), background="#293241", fg="#e0fbfc", font=("Arial", 12))
+        name.grid(row=0, column=0, padx=0, pady=12, sticky="W")
     
-        address = tk.Label(pf, text="Address: {0}".format(info[3]), background="#293241", fg="#e0fbfc", font=("Arial", 10))
-        address.grid(row=1, column=0, padx=0, pady=2, sticky="W")
+        address = tk.Label(pf, text="Address: {0}".format(info[3]), background="#293241", fg="#e0fbfc", font=("Arial", 12))
+        address.grid(row=1, column=0, padx=0, pady=12, sticky="W")
 
-        age = tk.Label(pf, text="Age: {0}".format(info[4]), background="#293241", fg="#e0fbfc", font=("Arial", 10))
-        age.grid(row=2, column=0, padx=0, pady=2, sticky="W")
+        age = tk.Label(pf, text="Age: {0}".format(info[4]), background="#293241", fg="#e0fbfc", font=("Arial", 12))
+        age.grid(row=2, column=0, padx=0, pady=12, sticky="W")
 
-        patientID = tk.Label(pf, text="Patient ID: {0}".format(info[0]), background="#293241", fg="#e0fbfc", font=("Arial", 10))
-        patientID.grid(row=3, column=0, padx=0, pady=2, sticky="W")
+        patientID = tk.Label(pf, text="Patient ID: {0}".format(info[0]), background="#293241", fg="#e0fbfc", font=("Arial", 12))
+        patientID.grid(row=3, column=0, padx=0, pady=12, sticky="W")
 
         
-        for r in range(4, 12):
+        for r in range(9, 18):
             space1 = tk.Label(pf, background="#293241")
             space1.grid(row=r, column=0)
 
-        get_vitals= tk.Button(pf, text="Check Vital Signs", height=2, width=15, font=("Arial", 10), background="#ee6c4d", command=check_vitals)
+        get_vitals= tk.Button(pf, text="Check Vital Signs", height=3, width=17, font=("Arial", 14), background="#ee6c4d", fg="#e0fbfc", command=check_vitals)
         get_vitals.grid(row=13, column=0, padx=10, pady=2)
 
         print(f"{bp_sys}, {bp_dys}, {temp}, {hr}, {ox_r}")
-        view_history= tk.Button(pf, text="View History", height=2, width=15, font=("Arial", 10), background="#e0fbfc", command=goto_history)
+        view_history= tk.Button(pf, text="View History", height=3, width=17, font=("Arial", 14), background="#e0fbfc", command=goto_history)
         view_history.grid(row=14, column=0, padx=10, pady=2)
 
         def goto_login():
+            global bp_sys, bp_dys, temp, hr, ox_r
+            bp_sys = 0
+            bp_dys = 0
+            temp = 0
+            hr = 0
+            ox_r = 0
             main.destroy()
             login_page()
 
-        logout = tk.Button(pf, text="Logout", height=1, width=15, font=("Arial", 10), background="#cf240a", command=goto_login)
+        logout = tk.Button(pf, text="Logout", height=2, width=17, font=("Arial", 14), background="#cf240a", fg="#e0fbfc", command=goto_login)
         logout.grid(row=15, column=0, padx=10, pady=2)
         
-        vital_signs = tk.LabelFrame(main, text="Vital Signs", background="#98C1D9", fg="#e0fbfc", font=("Arial", 16))
+        vital_signs = tk.LabelFrame(main, text="Vital Signs", background="#98C1D9", fg="#e0fbfc", font=("Arial", 18))
         vital_signs.grid(row=0, column=1, padx=1, pady=2, sticky="NW")
         #now = datetime.now()
         #format_date = now.strftime("%d/%m/%Y %H:%M:%S")
-        date_time = tk.Label(vital_signs, text=format_date, background="#98C1D9", font=("Arial", 10))
-        date_time.grid(row=0, column=1, padx=3, sticky="N")
-        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n {bp_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
-        blood_pressure.grid(row=0, column=0, padx=50, pady=73)
-        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n {temp_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
-        body_temp.grid(row=1, column=0, padx=50, pady=73)
+        date_time = tk.Label(vital_signs, text=format_date, background="#98C1D9", font=("Arial", 12))
+        date_time.grid(row=0, column=3, padx=3, sticky="N")
+        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n {bp_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16), width=17)
+        blood_pressure.grid(row=0, column=2, padx=90, pady=90)
+        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n {temp_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16), width=17)
+        body_temp.grid(row=1, column=2, padx=90, pady=90)
         
-        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n {hr_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
-        heart_rate.grid(row=0, column=1, padx=90, pady=73)
+        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n {hr_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16), width=17)
+        heart_rate.grid(row=0, column=3, padx=90, pady=90)
 
-        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n {or_classification}", background="#ee6c4d", font=("Arial", 12), width=15)
-        oxygen.grid(row=1, column=1, padx=90, pady=73)
+        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n {or_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16), width=17)
+        oxygen.grid(row=1, column=3, padx=90, pady=90)
 
         main.mainloop()
 
@@ -339,8 +341,16 @@ def check_vitals():
         global bp_classification, temp_classification, hr_classification, or_classification
         [temp, temp_classification] = ts.getTemperature()
         [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
-        [bp_sys, bp_dys, bp_classification] = bp.getBP()
-        print("niari diri")
+        [bp_sys, bp_dys] = bp.getBP()
+        if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
+            bp_classification = "Normal"
+        elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
+            bp_classification = "Pre-hypertension"
+        elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
+            bp_classification = "Stage 1 Hypertension"
+        elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
+            bp_classification = "Stage 2 Hypertension"
+            
         conn = accessDB()
         patient = conn.cursor()
         vitals = conn.cursor()
@@ -371,8 +381,8 @@ def history_page():
         c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s''', [fk_patient_id])
         rows = c.fetchall()
 
-        # Divide data into chunks of 5 rows
-        data_chunks = [rows[i:i+5] for i in range(0, len(rows), 6)]
+        # Divide data into chunks of 10 rows
+        data_chunks = [rows[i:i+10] for i in range(0, len(rows), 6)]
         current_chunk = 0
 
         history = tk.Tk()
@@ -380,33 +390,36 @@ def history_page():
         history.resizable(0,0)
         history.configure(background="#0583D2")
 
-        appHeight = 445
-        appWidth = 742
+        appHeight = 535
+        appWidth = 1015
 
         screenHeight = history.winfo_screenheight()
         screenWidth = history.winfo_screenwidth()
 
         x = (screenHeight / 2) - (appHeight / 2)
         y = (screenWidth / 2) - (appWidth / 2)
-        history.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x) - 20}')
+        history.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x) + 5}')
 
         history_frame = tk.Frame(history)
         history_frame.pack()
-
-        table = ttk.Treeview(history_frame, columns=(1,2,3,4,5,6), show="headings", height=7)
-        table.pack(pady=2)
         
-        table.column(1, stretch="NO", width=135)
+        style = ttk.Style()
+        style.configure("my.Treeview", rowheight=27, padding=30)
+
+        table = ttk.Treeview(history_frame, columns=(1,2,3,4,5,6), show="headings", height=15, style="my.Treeview")
+        table.pack(pady=15)
+        
+        table.column(1, stretch="NO", width=180)
         table.heading(1, text="Date-Time")
-        table.column(2, stretch="NO", width=120)
+        table.column(2, stretch="NO", width=160)
         table.heading(2, text="SystolicBP")
-        table.column(3, stretch="NO", width=120)
+        table.column(3, stretch="NO", width=160)
         table.heading(3, text="DiastolicBP")
-        table.column(4, stretch="NO", width=120)
+        table.column(4, stretch="NO", width=160)
         table.heading(4, text="Temperature")
-        table.column(5, stretch="NO", width=120)
+        table.column(5, stretch="NO", width=160)
         table.heading(5, text="Heart Rate")
-        table.column(6, stretch="NO", width=120)
+        table.column(6, stretch="NO", width=160)
         table.heading(6, text="Oxygen Level")
 
         # Function to update table with current data chunk
@@ -429,8 +442,8 @@ def history_page():
                 update_table()
 
         # Add pagination buttons
-        tk.Button(history, text="Prev", height=1, width=8, font=("Arial", 10), background="#ee6c4d", command=prev_page).place(x=10, y=410)
-        tk.Button(history, text="Next", height=1, width=8, font=("Arial", 10), background="#ee6c4d", command=next_page).place(x=650, y=410)
+        tk.Button(history, text="Prev", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=prev_page).place(x=8, y=440)
+        tk.Button(history, text="Next", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=next_page).place(x=880, y=440)
 
         # Show first page
         update_table()
@@ -439,7 +452,7 @@ def history_page():
             history.destroy()
             main_page()
 
-        tk.Button(history, text="BACK", height=1, width=10, font=("Arial", 10), background="#ee6c4d", command=back_to_main).place(x=330, y=410)
+        tk.Button(history, text="BACK", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=440, y=440)
     except:
         messagebox.showwarning("Warning", "Exception Failed")
 if __name__ == "__main__":
