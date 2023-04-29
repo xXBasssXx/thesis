@@ -9,7 +9,20 @@ import sms
 import thermal_sensor as ts
 import hr_or
 import bp
+import RPi.GPIO as GPIO
+import time
 
+# Set up the GPIO pins
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) # Red LED
+GPIO.setup(22, GPIO.OUT) # Green LED
+GPIO.setup(17, GPIO.OUT) # Buzzer
+
+GPIO.output(22, GPIO.LOW) #red
+GPIO.output(27, GPIO.LOW) #green
+GPIO.output(17, GPIO.LOW) #buzzer
+time.sleep(1)
 #initial data
 global bp_sys, bp_dys, temp, hr, ox_r
 bp_sys = 0
@@ -316,7 +329,7 @@ def main_page():
         logout = tk.Button(pf, text="Logout", height=2, width=17, font=("Arial", 14), background="#cf240a", fg="#e0fbfc", command=goto_login)
         logout.grid(row=15, column=0, padx=10, pady=2)
         
-        vital_signs = tk.LabelFrame(main, text="Vital Signs", background="#98C1D9", fg="#e0fbfc", font=("Arial", 18))
+        vital_signs = tk.LabelFrame(main, text="Vital Signs", background="#98C1D9", font=("Arial", 18))
         vital_signs.grid(row=0, column=1, padx=1, pady=2, sticky="NW")
         #now = datetime.now()
         #format_date = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -344,13 +357,25 @@ def check_vitals():
         [bp_sys, bp_dys] = bp.getBP()
         if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
             bp_classification = "Normal"
+            GPIO.output(22, GPIO.LOW) #red
+            GPIO.output(27, GPIO.HIGH) #green
+            GPIO.output(17, GPIO.LOW) #buzzer
         elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
             bp_classification = "Pre-hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
         elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
             bp_classification = "Stage 1 Hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
         elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
             bp_classification = "Stage 2 Hypertension"
-            
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        time.sleep(2)
         conn = accessDB()
         patient = conn.cursor()
         vitals = conn.cursor()
@@ -367,6 +392,10 @@ def check_vitals():
         conn.commit()
         conn.close()
         #print(infoPatient[-1] + infoVitals[-1])
+        GPIO.output(22, GPIO.LOW) #red
+        GPIO.output(27, GPIO.LOW) #green
+        GPIO.output(17, GPIO.LOW) #buzzer
+        time.sleep(1)
         sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
         global main
         main.destroy()

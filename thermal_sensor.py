@@ -4,9 +4,17 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import HORIZONTAL
 import time
+import RPi.GPIO as GPIO
 
 bus = SMBus(3)
 sensor = MLX90614(bus, address=0x5A)
+
+# Set up the GPIO pins
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) # Red LED
+GPIO.setup(22, GPIO.OUT) # Green LED
+GPIO.setup(17, GPIO.OUT) # Buzzer
 
 def createRoot():
     root = tk.Tk()
@@ -46,6 +54,10 @@ def getTemperature():
 
     temperature_list = []
     i = 0
+    GPIO.output(22, GPIO.LOW) #red
+    GPIO.output(27, GPIO.LOW) #green
+    GPIO.output(17, GPIO.LOW) #buzzer
+    time.sleep(1)
     while(i < 20):
         objectTemp = sensor.get_object_1()
         if objectTemp < 60:
@@ -64,8 +76,20 @@ def getTemperature():
     print("{:.2f}°C".format(avg_temperature))
     if(avg_temperature >= 33 and avg_temperature < 37):
         classification = "Normal"
+        GPIO.output(22, GPIO.LOW) #red
+        GPIO.output(27, GPIO.HIGH) #green
+        GPIO.output(17, GPIO.LOW) #buzzer
+        time.sleep(2)
     else:
         classification = "Not Normal Temperature"
+        GPIO.output(22, GPIO.HIGH) #red
+        GPIO.output(27, GPIO.LOW) #green
+        GPIO.output(17, GPIO.HIGH) #buzzer
+        time.sleep(2)
+        
+    GPIO.output(22, GPIO.LOW) #red
+    GPIO.output(27, GPIO.LOW) #green
+    GPIO.output(17, GPIO.LOW) #buzzer
     return ["{:.2f}".format(avg_temperature), classification]
 
 

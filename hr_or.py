@@ -4,6 +4,14 @@ import max30100
 import tkinter as tk
 from tkinter import ttk
 from tkinter import HORIZONTAL
+import RPi.GPIO as GPIO
+
+# Set up the GPIO pins
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) # Red LED
+GPIO.setup(22, GPIO.OUT) # Green LED
+GPIO.setup(17, GPIO.OUT) # Buzzer
 
 mx30 = max30100.MAX30100()
 mx30.enable_spo2()
@@ -73,7 +81,11 @@ def getReadings():
     root = createRoot()
     progress_bar = progressBar(root)
     step(progress_bar)
-
+    
+    GPIO.output(22, GPIO.LOW) #red
+    GPIO.output(27, GPIO.LOW) #green
+    GPIO.output(17, GPIO.LOW) #buzzer
+    time.sleep(1)
     i = 0
     while(i < 60):
         mx30.read_sensor()
@@ -96,12 +108,31 @@ def getReadings():
     root.destroy()
     if bpm >= 60 and bpm <= 100:
         hr_classification = "Normal"
+        GPIO.output(22, GPIO.LOW) #red
+        GPIO.output(27, GPIO.HIGH) #green
+        GPIO.output(17, GPIO.LOW) #buzzer
+        time.sleep(2)
     else:
-        hr_classification = "Seek Medical Treatment"
+        hr_classification = "Warning!"
+        GPIO.output(22, GPIO.HIGH) #red
+        GPIO.output(27, GPIO.LOW) #green
+        GPIO.output(17, GPIO.HIGH) #buzzer
+        time.sleep(2)
 
     if spo2 >= 95 and spo2 <= 100:
         or_classification = "Normal"
+        GPIO.output(22, GPIO.LOW) #red
+        GPIO.output(27, GPIO.HIGH) #green
+        GPIO.output(17, GPIO.LOW) #buzzer
+        time.sleep(2)
     else:
-        or_classification = "Seek Medical Treatment"
+        or_classification = "Warning!"
+        GPIO.output(22, GPIO.HIGH) #red
+        GPIO.output(27, GPIO.LOW) #green
+        GPIO.output(17, GPIO.HIGH) #buzzer
+        time.sleep(2)
     
+    GPIO.output(22, GPIO.LOW) #red
+    GPIO.output(27, GPIO.LOW) #green
+    GPIO.output(17, GPIO.LOW) #buzzer
     return [bpm, spo2, hr_classification, or_classification]
