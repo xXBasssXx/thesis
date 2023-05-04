@@ -4,26 +4,25 @@ from tkinter import ttk
 from datetime import datetime
 from datetime import date
 import psycopg2
-
-# # import sms
-# # import thermal_sensor as ts
-# # import hr_or
-# # import bp
-# # import RPi.GPIO as GPIO
+import sms
+import thermal_sensor as ts
+import hr_or
+import bp
+import RPi.GPIO as GPIO
 import time
 import subprocess
 
 # Set up the GPIO pins
-# GPIO.setwarnings(False)
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(27, GPIO.OUT) # Red LED
-# GPIO.setup(22, GPIO.OUT) # Green LED
-# GPIO.setup(17, GPIO.OUT) # Buzzer
-# 
-# GPIO.output(22, GPIO.LOW) #red
-# GPIO.output(27, GPIO.LOW) #green
-# GPIO.output(17, GPIO.LOW) #buzzer
-# time.sleep(1)
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) # Red LED
+GPIO.setup(22, GPIO.OUT) # Green LED
+GPIO.setup(17, GPIO.OUT) # Buzzer
+
+GPIO.output(22, GPIO.LOW) #red
+GPIO.output(27, GPIO.LOW) #green
+GPIO.output(17, GPIO.LOW) #buzzer
+time.sleep(1)
 #initial data
 global bp_sys, bp_dys, temp, hr, ox_r
 bp_sys = 0
@@ -321,7 +320,7 @@ def main_page():
             space1 = tk.Label(pf, background="#293241")
             space1.grid(row=r, column=0)
 
-        get_vitals= tk.Button(pf, text="Check Vital Signs", height=4, width=18, font=("Arial", 14, "bold"), background="#ee6c4d", fg="#e0fbfc", command=check_vitals)
+        get_vitals= tk.Button(pf, text="Check Vital Signs", height=4, width=18, font=("Arial", 14, "bold"), background="#40a944", fg="black", command=check_vitals)
         get_vitals.grid(row=13, column=0, padx=10, pady=2)
 
         print(f"{bp_sys}, {bp_dys}, {temp}, {hr}, {ox_r}")
@@ -345,48 +344,50 @@ def main_page():
         vital_signs.grid(row=0, column=1, padx=1, pady=2, sticky="NW")
         #now = datetime.now()
         #format_date = now.strftime("%d/%m/%Y %H:%M:%S")
+        logout = tk.Button(vital_signs, text="?", height=1, width=5, font=("Arial", 12, "bold"), background="#98C1D9", command=legend_page)
+        logout.grid(row=0, column=3, pady=30, sticky="N")
         date_time = tk.Label(vital_signs, text=format_date, background="#98C1D9", font=("Arial", 12))
         date_time.grid(row=0, column=3, padx=3, sticky="N")
-        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n {bp_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16, "bold"), width=17)
+        blood_pressure = tk.Label(vital_signs, text=f"Blood Pressure\n {bp_sys}/{bp_dys} mm/Hg \n {bp_classification}", background="#293241", fg="#e0fbfc", font=("Arial", 18, "bold"), width=17)
         blood_pressure.grid(row=0, column=2, padx=90, pady=90)
-        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n {temp_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16, "bold"), width=17)
+        body_temp = tk.Label(vital_signs, text=f"Body Temperature\n {temp}°C \n {temp_classification}", background="#293241", fg="#e0fbfc", font=("Arial", 18, "bold"), width=17)
         body_temp.grid(row=1, column=2, padx=90, pady=90)
         
-        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n {hr_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16, "bold"), width=17)
+        heart_rate = tk.Label(vital_signs, text=f"Heart Rate\n {hr} BPM \n {hr_classification}", background="#293241", fg="#e0fbfc", font=("Arial", 18, "bold"), width=17)
         heart_rate.grid(row=0, column=3, padx=90, pady=90)
 
-        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n {or_classification}", background="#ee6c4d", fg="#e0fbfc", font=("Arial", 16, "bold"), width=17)
+        oxygen = tk.Label(vital_signs, text=f"Oxygen Saturation\n {ox_r}% \n {or_classification}", background="#293241", fg="#e0fbfc", font=("Arial", 18, "bold"), width=17)
         oxygen.grid(row=1, column=3, padx=90, pady=90)
-
+        
         main.mainloop()
 
 def check_vitals():
     try:
         global bp_sys, bp_dys, temp, hr, ox_r
         global bp_classification, temp_classification, hr_classification, or_classification
-#         [temp, temp_classification] = ts.getTemperature()
-#         [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
-#         [bp_sys, bp_dys] = bp.getBP()
-#         if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
-#             bp_classification = "Normal"
-#             GPIO.output(22, GPIO.LOW) #red
-#             GPIO.output(27, GPIO.HIGH) #green
-#             GPIO.output(17, GPIO.LOW) #buzzer
-#         elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
-#             bp_classification = "Pre-hypertension"
-#             GPIO.output(22, GPIO.HIGH) #red
-#             GPIO.output(27, GPIO.LOW) #green
-#             GPIO.output(17, GPIO.HIGH) #buzzer
-#         elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
-#             bp_classification = "Stage 1 Hypertension"
-#             GPIO.output(22, GPIO.HIGH) #red
-#             GPIO.output(27, GPIO.LOW) #green
-#             GPIO.output(17, GPIO.HIGH) #buzzer
-#         elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
-#             bp_classification = "Stage 2 Hypertension"
-#             GPIO.output(22, GPIO.HIGH) #red
-#             GPIO.output(27, GPIO.LOW) #green
-#             GPIO.output(17, GPIO.HIGH) #buzzer
+        [temp, temp_classification] = ts.getTemperature()
+        [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
+        [bp_sys, bp_dys] = bp.getBP()
+        if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
+            bp_classification = "Normal"
+            GPIO.output(22, GPIO.LOW) #red
+            GPIO.output(27, GPIO.HIGH) #green
+            GPIO.output(17, GPIO.LOW) #buzzer
+        elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
+            bp_classification = "Pre-hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
+            bp_classification = "Stage 1 Hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
+            bp_classification = "Stage 2 Hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
         time.sleep(2)
         conn = accessDB()
         patient = conn.cursor()
@@ -408,7 +409,7 @@ def check_vitals():
         GPIO.output(27, GPIO.LOW) #green
         GPIO.output(17, GPIO.LOW) #buzzer
         time.sleep(1)
-        #sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
+        sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
         global main
         main.destroy()
         main_page()
@@ -424,9 +425,14 @@ def history_page():
     try:
         conn = accessDB()
         c = conn.cursor()
+        c.execute('''SELECT * FROM Patient WHERE patient_id = %s''', [pat_id_check])
+        info = c.fetchone()
+        print(info)
         c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s''', [fk_patient_id])
         rows = c.fetchall()
-    
+        
+        conn.commit()
+        conn.close()
         # Divide data into chunks of 10 rows
         data_chunks = [rows[i:i+10] for i in range(0, len(rows), 6)]
         current_chunk = 0
@@ -445,7 +451,9 @@ def history_page():
         x = (screenHeight / 2) - (appHeight / 2)
         y = (screenWidth / 2) - (appWidth / 2)
         history.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x) + 5}')
-
+        
+        #title
+        tk.Label(history, text=f"Hello, {info[1]}!", background="#0583D2", fg="black", font=("Arial", 22, "bold", "underline"), foreground="#FFFFFF").place(x=0, y=0)
         history_frame = tk.Frame(history)
         history_frame.pack()
         
@@ -498,7 +506,30 @@ def history_page():
         messagebox.showwarning("Warning", "History is empty...")
     finally:
         tk.Button(history, text="BACK", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=440, y=440)
-        
+
+def legend_page():
+    legend = tk.Tk()
+    legend.title("Legend Page")
+    legend.resizable(0,0)
+    legend.configure(background="#0583D2")
+    
+    appHeight = 450
+    appWidth = 300
+
+    screenHeight = legend.winfo_screenheight()
+    screenWidth = legend.winfo_screenwidth()
+
+    x = (screenHeight / 2) - (appHeight / 2)
+    y = (screenWidth / 2) - (appWidth / 2)
+    legend.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x)}')
+
+    #title
+    tk.Label(legend, text="Legend", background="#0583D2", font=("Arial", 22, "bold", "underline"), foreground="#FFFFFF").place(x=90, y=5)
+    
+    tk.Label(legend, text="Temperature:           \n37°C-35°C - Normal\n↑37.5°C - Fever          \n↓35°C - Hypothermia", background="#0583D2", fg="white", font=("Arial", 14, "bold")).place(x=0, y=50)
+    #tk.Label(legend, text="Heart Rate:            			\n60-100BPM - Normal				\n↑100BPM and ↓60BPM - Warning", background="#0583D2", fg="white", font=("Arial", 14, "bold")).place(x=0, y=150)
+    legend.mainloop()
+    
 if __name__ == "__main__":
     createUserTable()
     login_page()

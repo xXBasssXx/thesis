@@ -58,7 +58,7 @@ def getTemperature():
     GPIO.output(27, GPIO.LOW) #green
     GPIO.output(17, GPIO.LOW) #buzzer
     time.sleep(1)
-    while(i < 20):
+    while(i < 40):
         objectTemp = sensor.get_object_1()
         if objectTemp < 60:
             print("Object Temperature:", objectTemp,"°C")
@@ -74,14 +74,14 @@ def getTemperature():
 
     avg_temperature = sum(temperature_list) / len(temperature_list)
     print("{:.2f}°C".format(avg_temperature))
-    if(avg_temperature >= 33 and avg_temperature < 37):
+    if(avg_temperature >= 35 and avg_temperature <= 38):
         classification = "Normal"
         GPIO.output(22, GPIO.LOW) #red
         GPIO.output(27, GPIO.HIGH) #green
         GPIO.output(17, GPIO.LOW) #buzzer
         time.sleep(2)
     else:
-        classification = "Not Normal Temperature"
+        classification = "Warning!"
         GPIO.output(22, GPIO.HIGH) #red
         GPIO.output(27, GPIO.LOW) #green
         GPIO.output(17, GPIO.HIGH) #buzzer
@@ -91,5 +91,6 @@ def getTemperature():
     GPIO.output(27, GPIO.LOW) #green
     GPIO.output(17, GPIO.LOW) #buzzer
     return ["{:.2f}".format(avg_temperature), classification]
+    
 
 
