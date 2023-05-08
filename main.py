@@ -5,24 +5,24 @@ from datetime import datetime
 from datetime import date
 import psycopg2
 import sms
-# import thermal_sensor as ts
-# import hr_or
-# import bp
-# import RPi.GPIO as GPIO
-# import time
-# import subprocess
+import thermal_sensor as ts
+import hr_or
+import bp
+import RPi.GPIO as GPIO
+import time
+import subprocess
 
 # Set up the GPIO pins
-# GPIO.setwarnings(False)
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(27, GPIO.OUT) # Red LED
-# GPIO.setup(22, GPIO.OUT) # Green LED
-# GPIO.setup(17, GPIO.OUT) # Buzzer
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT) # Red LED
+GPIO.setup(22, GPIO.OUT) # Green LED
+GPIO.setup(17, GPIO.OUT) # Buzzer
 
-# GPIO.output(22, GPIO.LOW) #red
-# GPIO.output(27, GPIO.LOW) #green
-# GPIO.output(17, GPIO.LOW) #buzzer
-# time.sleep(1)
+GPIO.output(22, GPIO.LOW) #red
+GPIO.output(27, GPIO.LOW) #green
+GPIO.output(17, GPIO.LOW) #buzzer
+time.sleep(1)
 #initial data
 global bp_sys, bp_dys, temp, hr, ox_r
 bp_sys = 0
@@ -134,7 +134,7 @@ def login_page():
                 result = c.fetchone()
                 if result:
                     login.destroy()
-                    # subprocess.Popen(['killall', 'onboard'])
+                    subprocess.Popen(['killall', 'onboard'])
                     main_page()
                 else:
                     messagebox.showwarning("Warning", "Patient ID not found")
@@ -152,7 +152,7 @@ def login_page():
     screenHeight = login.winfo_screenheight()
     screenWidth = login.winfo_screenwidth()
 
-    y = 0
+    y = 25
     x = (screenWidth / 2) - (appWidth / 2)
     login.geometry(f'{appWidth}x{appHeight}+{int(x)}+{int(y)}')
 
@@ -206,7 +206,7 @@ def registration_page():
                 conn.close()
                 messagebox.showinfo("Patient ID", "Your Patient ID is {0}".format(p_id))
                 registration.destroy()
-                # subprocess.Popen(['killall', 'onboard'])
+                subprocess.Popen(['killall', 'onboard'])
                 login_page()
             except ValueError:
                 messagebox.showwarning("Warning", "Invalid date format")
@@ -219,7 +219,7 @@ def registration_page():
     screenHeight = registration.winfo_screenheight()
     screenWidth = registration.winfo_screenwidth()
 
-    y = 0
+    y = 25
     x = (screenWidth / 2) - (appWidth / 2)
     registration.geometry(f'{appWidth}x{appHeight}+{int(x)}+{int(y)}')
 
@@ -243,7 +243,7 @@ def registration_page():
     max_year = today.year
     max_date = date(max_year, 12, 31)
     global age
-    tk.Label(registration, text="Age (YYYY-MM-DD):", background="#0583D2", font=("Arial", 17, "bold"), foreground="#FFFFFF").place(x=20, y=130)
+    tk.Label(registration, text="Birthdate (YYYY-MM-DD):", background="#0583D2", font=("Arial", 17, "bold"), foreground="#FFFFFF").place(x=20, y=130)
     age = tk.Entry(registration, justify="left", width=25, font=("Arial", 17), background="#D3D3D3")
     age.place(x=24, y=160)
     #address
@@ -253,12 +253,12 @@ def registration_page():
     address.place(x=500, y=160)
     #doctors contact
     global doc_num
-    tk.Label(registration, text="Doctor's Number: (+699xxxxxxxxx)", background="#0583D2", font=("Arial", 15, "bold"), foreground="#FFFFFF").place(x=20, y=205)
+    tk.Label(registration, text="Doctor's Number: (+639xxxxxxxxx)", background="#0583D2", font=("Arial", 15, "bold"), foreground="#FFFFFF").place(x=20, y=205)
     doc_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 17), background="#D3D3D3")
     doc_num.place(x=24, y=230)
     #relative contact
     global relative_num
-    tk.Label(registration, text="Relative's Number: (+699xxxxxxxxx)", background="#0583D2", font=("Arial", 15, "bold"), foreground="#FFFFFF").place(x=500, y=205)
+    tk.Label(registration, text="Relative's Number: (+639xxxxxxxxx)", background="#0583D2", font=("Arial", 15, "bold"), foreground="#FFFFFF").place(x=500, y=205)
     relative_num = tk.Entry(registration, justify="left", width=25, font=("Arial", 17), background="#D3D3D3")
     relative_num.place(x=500, y=230)
     tk.Button(registration, text="REGISTER", height=2, width=25, font=("Arial", 16, "bold"), foreground="#FFFFFF", background="#ee6c4d", command=check_exceptions).place(relx=0.5, rely=0.9, anchor="center")
@@ -384,51 +384,51 @@ def check_vitals():
         temp_classification = "Normal"
         or_classification = "Normal"
         hr_classification = "Warning"
-        # [temp, temp_classification] = ts.getTemperature()
-        # [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
-        # [bp_sys, bp_dys] = bp.getBP()
-        # if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
-        #     bp_classification = "Normal"
-        #     GPIO.output(22, GPIO.LOW) #red
-        #     GPIO.output(27, GPIO.HIGH) #green
-        #     GPIO.output(17, GPIO.LOW) #buzzer
-        # elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
-        #     bp_classification = "Pre-hypertension"
-        #     GPIO.output(22, GPIO.HIGH) #red
-        #     GPIO.output(27, GPIO.LOW) #green
-        #     GPIO.output(17, GPIO.HIGH) #buzzer
-        # elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
-        #     bp_classification = "Stage 1 Hypertension"
-        #     GPIO.output(22, GPIO.HIGH) #red
-        #     GPIO.output(27, GPIO.LOW) #green
-        #     GPIO.output(17, GPIO.HIGH) #buzzer
-        # elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
-        #     bp_classification = "Stage 2 Hypertension"
-        #     GPIO.output(22, GPIO.HIGH) #red
-        #     GPIO.output(27, GPIO.LOW) #green
-        #     GPIO.output(17, GPIO.HIGH) #buzzer
-        # time.sleep(2)
-        # conn = accessDB()
-        # patient = conn.cursor()
-        # vitals = conn.cursor()
+        [temp, temp_classification] = ts.getTemperature()
+        [hr, ox_r, hr_classification, or_classification] = hr_or.getReadings()
+        [bp_sys, bp_dys] = bp.getBP()
+        if(int(bp_sys) <= 120 or int(bp_dys) <= 80):
+            bp_classification = "Normal"
+            GPIO.output(22, GPIO.LOW) #red
+            GPIO.output(27, GPIO.HIGH) #green
+            GPIO.output(17, GPIO.LOW) #buzzer
+        elif((int(bp_sys) > 120 and int(bp_sys) <= 140) or (int(bp_dys) > 80 and int(bp_dys) <= 90)):
+            bp_classification = "Pre-hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        elif((int(bp_sys) > 140 and int(bp_sys) <= 160) or (int(bp_dys) > 90 and int(bp_dys) <= 99)):
+            bp_classification = "Stage 1 Hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        elif((int(bp_sys) > 160) or  (int(bp_dys) >= 100)):
+            bp_classification = "Stage 2 Hypertension"
+            GPIO.output(22, GPIO.HIGH) #red
+            GPIO.output(27, GPIO.LOW) #green
+            GPIO.output(17, GPIO.HIGH) #buzzer
+        time.sleep(2)
+        conn = accessDB()
+        patient = conn.cursor()
+        vitals = conn.cursor()
 
-        # vitals.execute('''INSERT INTO VitalSigns (date_time, systolic_bp, diastolic_bp, body_temp, heart_rate, oxygen_level, patient_id)
-        #                         VALUES (%s, %s, %s, %s, %s, %s, %s);''', (str(format_date), str(bp_sys), str(bp_dys), temp, hr, ox_r, fk_patient_id))
+        vitals.execute('''INSERT INTO VitalSigns (date_time, systolic_bp, diastolic_bp, body_temp, heart_rate, oxygen_level, patient_id)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s);''', (str(format_date), str(bp_sys), str(bp_dys), temp, hr, ox_r, fk_patient_id))
         
-        # patient.execute('''SELECT * FROM Patient WHERE patient_id = %s''', [pat_id_check])
-        # vitals.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s''', [pat_id_check])
-        # infoPatient = patient.fetchall()
-        # infoVitals = vitals.fetchall()
+        patient.execute('''SELECT * FROM Patient WHERE patient_id = %s''', [pat_id_check])
+        vitals.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s''', [pat_id_check])
+        infoPatient = patient.fetchall()
+        infoVitals = vitals.fetchall()
         
         
-        # conn.commit()
-        # conn.close()
-        # #print(infoPatient[-1] + infoVitals[-1])
-        # GPIO.output(22, GPIO.LOW) #red
-        # GPIO.output(27, GPIO.LOW) #green
-        # GPIO.output(17, GPIO.LOW) #buzzer
-        # time.sleep(1)
-        # sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
+        conn.commit()
+        conn.close()
+        #print(infoPatient[-1] + infoVitals[-1])
+        GPIO.output(22, GPIO.LOW) #red
+        GPIO.output(27, GPIO.LOW) #green
+        GPIO.output(17, GPIO.LOW) #buzzer
+        time.sleep(1)
+        sms.send_alert(infoPatient[-1][5], infoPatient[-1][6], infoPatient[-1][0], infoVitals[-1][3], infoVitals[-1][5], infoVitals[-1][4], infoVitals[-1][1], infoVitals[-1][2])
         global main
         main.destroy()
         main_page()
@@ -441,6 +441,28 @@ def history_page():
             history.destroy()
             main_page()
             
+    def filter_by_day():
+        nonlocal rows, data_chunks, current_chunk
+        conn = accessDB()
+        c = conn.cursor()
+        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime(datetime)>=datetime('now','-1 days')''', [fk_patient_id])
+        rows = c.fetchall()
+        conn.close()
+        data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
+        current_chunk = 0
+        update_table()
+        
+    def filter_by_week():
+        nonlocal rows, data_chunks, current_chunk
+        conn = accessDB()
+        c = conn.cursor()
+        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime(datetime)>=datetime('now','-7 days')''', [fk_patient_id])
+        rows = c.fetchall()
+        conn.close()
+        data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
+        current_chunk = 0
+        update_table()
+
     try:
         conn = accessDB()
         c = conn.cursor()
@@ -453,7 +475,7 @@ def history_page():
         conn.commit()
         conn.close()
         # Divide data into chunks of 10 rows
-        data_chunks = [rows[i:i+10] for i in range(0, len(rows), 6)]
+        data_chunks = [rows[i:i+10] for i in range(0, len(rows), 5)]
         current_chunk = 0
 
         history = tk.Tk()
@@ -517,7 +539,10 @@ def history_page():
 
         # Add pagination buttons
         tk.Button(history, text="Prev", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=prev_page).place(x=8, y=440)
-        tk.Button(history, text="Next", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=next_page).place(x=880, y=440)
+        tk.Button(history, text="Next", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=next_page).place(x=250, y=440)
+        
+        tk.Button(history, text="Day", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=filter_by_day).place(x=800, y=440)
+        tk.Button(history, text="Week", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=filter_by_week).place(x=900, y=440)
 
         # Show first page
         update_table()
@@ -525,7 +550,7 @@ def history_page():
     except:
         messagebox.showwarning("Warning", "History is empty...")
     finally:
-        tk.Button(history, text="BACK", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=440, y=440)
+        tk.Button(history, text="BACK", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=120, y=440)
 
 def legend_page():
     legend = tk.Tk()
@@ -533,8 +558,8 @@ def legend_page():
     legend.resizable(0,0)
     legend.configure(background="#98C1D9")
     
-    appHeight = 450
-    appWidth = 330
+    appHeight = 500
+    appWidth = 360
 
     screenHeight = legend.winfo_screenheight()
     screenWidth = legend.winfo_screenwidth()
@@ -548,27 +573,35 @@ def legend_page():
 
     
     # Temperature legend
-    tk.Label(legend, text="Temperature:", background="#98C1D9", fg="#293241", font=("Arial", 12, "bold")).place(x=20, y=50)
-    tk.Label(legend, text="37°C-35°C - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 10, "bold")).place(x=35, y=80)
-    tk.Label(legend, text="↑37.5°C - Fever", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=100)
-    tk.Label(legend, text="↓35°C - Hypothermia", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=120)
+    tk.Label(legend, text="Temperature:", background="#98C1D9", fg="#293241", font=("Arial", 13, "bold")).place(x=20, y=50)
+    tk.Label(legend, text="37°C-35°C - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 11, "bold")).place(x=35, y=80)
+    tk.Label(legend, text="↑37.5°C - Fever", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=100)
+    tk.Label(legend, text="↓35°C - Hypothermia", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=120)
 
     # Heart rate legend
-    tk.Label(legend, text="Heart Rate:", background="#98C1D9", fg="#293241", font=("Arial", 12, "bold")).place(x=20, y=150)
-    tk.Label(legend, text="60-100 BPM - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 10, "bold")).place(x=35, y=180)
-    tk.Label(legend, text="↑100 BPM and ↓60 BPM - Warning", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=200)
+    tk.Label(legend, text="Heart Rate:", background="#98C1D9", fg="#293241", font=("Arial", 13, "bold")).place(x=20, y=150)
+    tk.Label(legend, text="60-100 BPM - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 11, "bold")).place(x=35, y=180)
+    tk.Label(legend, text="↑100 BPM and ↓60 BPM - Warning", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=200)
 
     # Oxygen level legend
-    tk.Label(legend, text="Oxygen Level:", background="#98C1D9", fg="#293241", font=("Arial", 12, "bold")).place(x=20, y=230)
-    tk.Label(legend, text="95%-100% - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 10, "bold")).place(x=35, y=260)
-    tk.Label(legend, text="90%-94% - Warning", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=280)
+    tk.Label(legend, text="Oxygen Level:", background="#98C1D9", fg="#293241", font=("Arial", 13, "bold")).place(x=20, y=230)
+    tk.Label(legend, text="95%-100% - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 11, "bold")).place(x=35, y=260)
+    tk.Label(legend, text="90%-94% - Warning", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=280)
 
     #blood pressure legend
-    tk.Label(legend, text="Blood Pressure:", background="#98C1D9", fg="#293241", font=("Arial", 12, "bold")).place(x=20, y=310)
-    tk.Label(legend, text="120/80 mmHg or less - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 10, "bold")).place(x=35, y=340)
-    tk.Label(legend, text="120/80 - 140/90 mmHg - Pre-hypertension", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=360)
-    tk.Label(legend, text="140/80 mmHg - 160/99 - Hypertension Stage 1", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=380)
-    tk.Label(legend, text="↑160/99 mmHg - Hypertension Stage 2", background="#98C1D9", fg="#FF0000", font=("Arial", 10, "bold")).place(x=35, y=400)
+    tk.Label(legend, text="Blood Pressure:", background="#98C1D9", fg="#293241", font=("Arial", 13, "bold")).place(x=20, y=310)
+    tk.Label(legend, text="120/80 mmHg or less - Normal", background="#98C1D9", fg="#40a944", font=("Arial", 11, "bold")).place(x=35, y=340)
+    tk.Label(legend, text="120/80 - 140/90 mmHg - Pre-hypertension", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=360)
+    tk.Label(legend, text="140/80 mmHg - 160/99 - Hypertension Stage 1", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=380)
+    tk.Label(legend, text="↑160/99 mmHg - Hypertension Stage 2", background="#98C1D9", fg="#FF0000", font=("Arial", 11, "bold")).place(x=35, y=400)
+    back = tk.Button(legend, text="Back", font=("Arial", 12), bg="#FF4D4D", fg="white", command=back_to_main)
+    back.place(relx=0.5, rely=0.9, anchor="center")
+
+    
+    def back_to_main():
+            legend.destroy()
+            main_page()
+            
     legend.mainloop()
     
 if __name__ == "__main__":
