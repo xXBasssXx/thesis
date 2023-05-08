@@ -445,7 +445,7 @@ def history_page():
         nonlocal rows, data_chunks, current_chunk
         conn = accessDB()
         c = conn.cursor()
-        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime(datetime)>=datetime('now','-1 days')''', [fk_patient_id])
+        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime >= NOW() - INTERVAL '1 day' ''', (fk_patient_id,))
         rows = c.fetchall()
         conn.close()
         data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
@@ -456,7 +456,7 @@ def history_page():
         nonlocal rows, data_chunks, current_chunk
         conn = accessDB()
         c = conn.cursor()
-        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime(datetime)>=datetime('now','-7 days')''', [fk_patient_id])
+        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime >= NOW() - INTERVAL '7 days' ''', (fk_patient_id,))
         rows = c.fetchall()
         conn.close()
         data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
