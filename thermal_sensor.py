@@ -72,9 +72,9 @@ def getTemperature():
 
     root.destroy()
 
-    avg_temperature = sum(temperature_list) / len(temperature_list)
-    print("{:.2f}°C".format(avg_temperature))
-    if(avg_temperature >= 35 and avg_temperature <= 38):
+    #avg_temperature = sum(temperature_list) / len(temperature_list)
+    #print("{:.2f}°C".format(avg_temperature))
+    if(avg_temperature >= 35 and objectTemp <= 38):
         classification = "Normal"
         GPIO.output(22, GPIO.LOW) #red
         GPIO.output(27, GPIO.HIGH) #green
@@ -90,7 +90,7 @@ def getTemperature():
     GPIO.output(22, GPIO.LOW) #red
     GPIO.output(27, GPIO.LOW) #green
     GPIO.output(17, GPIO.LOW) #buzzer
-    return ["{:.2f}".format(avg_temperature), classification]
+    return ["{:.2f}".format(objectTemp), classification]
     
 
 
