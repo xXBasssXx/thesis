@@ -440,30 +440,93 @@ def history_page():
     def back_to_main():
             history.destroy()
             main_page()
-            
-    def filter_by_day():
-        nonlocal rows, data_chunks, current_chunk
-        conn = accessDB()
-        c = conn.cursor()
-        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime >= NOW() - INTERVAL '1 day' ''', (fk_patient_id,))
-        rows = c.fetchall()
-        conn.close()
-        data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
-        current_chunk = 0
-        update_table()
         
-    def filter_by_week():
-        nonlocal rows, data_chunks, current_chunk
-        conn = accessDB()
-        c = conn.cursor()
-        c.execute('''SELECT * FROM VitalSigns WHERE patient_id = %s AND datetime >= NOW() - INTERVAL '7 days' ''', (fk_patient_id,))
-        rows = c.fetchall()
-        conn.close()
-        data_chunks = [rows[i:i+5] for i in range(0, len(rows), 5)]
-        current_chunk = 0
-        update_table()
+    def generate_summary(start_date, end_date):
+        try:
+            conn = accessDB()
+            c = conn.cursor()
+
+            vitals = ['systolic_bp', 'diastolic_bp', 'body_temp', 'heart_rate', 'oxygen_level']
+            summary_data = []
+            for vital in vitals:
+                # fetch min, max, avg and corresponding dates
+                for metric in ['min', 'max']:
+                    c.execute(
+                        f'''
+                        WITH filtered AS (
+                            SELECT date_time, {vital}
+                            FROM VitalSigns
+                            WHERE patient_id = %s AND to_timestamp(date_time, 'DD/MM/YYYY HH24:MI:SS') 
+                            BETWEEN to_timestamp(%s, 'DD/MM/YYYY HH24:MI:SS') AND to_timestamp(%s, 'DD/MM/YYYY HH24:MI:SS')
+                        )
+                        SELECT date_time, {vital} 
+                        FROM filtered
+                        WHERE {vital} = (SELECT {metric}({vital}) FROM filtered)
+                        ORDER BY date_time
+                        LIMIT 1
+                        ''', 
+                        (fk_patient_id, start_date, end_date))
+
+                    result = c.fetchone()
+                    summary_data.extend(result)
+                
+                # fetch average
+                c.execute(
+                    f'''
+                    SELECT ROUND(AVG({vital}),2)
+                    FROM VitalSigns
+                    WHERE patient_id = %s AND to_timestamp(date_time, 'DD/MM/YYYY HH24:MI:SS') 
+                    BETWEEN to_timestamp(%s, 'DD/MM/YYYY HH24:MI:SS') AND to_timestamp(%s, 'DD/MM/YYYY HH24:MI:SS')
+                    ''', 
+                    (fk_patient_id, start_date, end_date))
+
+                result = c.fetchone()
+                summary_data.append(result[0])
+
+            conn.close()
+            return summary_data
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+
 
     try:
+        def bp_classification(systolic_bp, diastolic_bp):
+            systolic_bp, diastolic_bp = int(systolic_bp), int(diastolic_bp)
+            if systolic_bp <= 120 and diastolic_bp <= 80:
+                return "Normal"
+            elif 120 < systolic_bp <= 140 or 80 < diastolic_bp <= 90:
+                return "Pre-hypertension"
+            elif 140 < systolic_bp <= 160 or 90 < diastolic_bp <= 99:
+                return "Stage 1 Hypertension"
+            else:
+                return "Stage 2 Hypertension"
+
+        def temp_classification(temp):
+            temp = float(temp)
+            if 35 <= temp <= 37:
+                return "Normal"
+            elif temp < 35:
+                return "Hypothermia"
+            else:
+                return "Fever"
+
+        def hr_classification(heart_rate):
+            heart_rate = int(heart_rate)
+            if 60 <= heart_rate <= 100:
+                return "Normal"
+            else:
+                return "Warning"
+
+        def ox_classification(oxygen_level):
+            oxygen_level = int(oxygen_level)
+            if 95 <= oxygen_level <= 100:
+                return "Normal"
+            else:
+                return "Warning"
+        
+        
         conn = accessDB()
         c = conn.cursor()
         c.execute('''SELECT * FROM Patient WHERE patient_id = %s''', [pat_id_check])
@@ -501,28 +564,65 @@ def history_page():
         
         style = ttk.Style()
         style.configure("my.Treeview", rowheight=27, padding=30)
-
-        table = ttk.Treeview(history_frame, columns=(1,2,3,4,5,6), show="headings", height=15, style="my.Treeview")
-        table.pack(pady=15)
         
-        table.column(1, stretch="NO", width=180)
-        table.heading(1, text="Date-Time")
-        table.column(2, stretch="NO", width=160)
-        table.heading(2, text="SystolicBP")
-        table.column(3, stretch="NO", width=160)
-        table.heading(3, text="DiastolicBP")
-        table.column(4, stretch="NO", width=160)
-        table.heading(4, text="Temperature")
-        table.column(5, stretch="NO", width=160)
-        table.heading(5, text="Heart Rate")
-        table.column(6, stretch="NO", width=160)
-        table.heading(6, text="Oxygen Level")
+        canvas = tk.Canvas(history_frame, height=350, width=900)
+        canvas.pack(side="left", fill="both", expand=True)
+        
+    
+        table = ttk.Treeview(history_frame, columns=(1,2,3,4,5,6,7,8,9,10), show="headings", height=15, style="my.Treeview")
+        table.pack(pady=15)
 
+        
+        def update_scrollregion(event):
+            canvas.configure(scrollregion= canvas.bbox("all"))
+            
+        table.bind("<Configure>", update_scrollregion)
+        
+        table.column(1, stretch="YES", width=180)
+        table.heading(1, text="Date-Time")
+        table.column(2, stretch="YES", width=160)
+        table.heading(2, text="SystolicBP")
+        table.column(3, stretch="YES", width=160)
+        table.heading(3, text="DiastolicBP")
+        table.column(4, stretch="YES", width=160)
+        table.heading(4, text="BP Class")
+        table.column(5, stretch="YES", width=160)
+        table.heading(5, text="Temperature")
+        table.column(6, stretch="YES", width=160)
+        table.heading(6, text="Temp Class")
+        table.column(7, stretch="YES", width=160)
+        table.heading(7, text="Heart Rate")
+        table.column(8, stretch="YES", width=160)
+        table.heading(8, text="HR Class")
+        table.column(9, stretch="YES", width=160)
+        table.heading(9, text="Oxygen Level")
+        table.column(10, stretch="YES", width=160)
+        table.heading(10, text="Ox Class")
+
+                
+        hsb = ttk.Scrollbar(history_frame, orient='horizontal', command=canvas.xview)
+        hsb.pack(side='bottom', fill='x')
+        
+        canvas.configure(xscrollcommand=hsb.set)
+        canvas_window = canvas.create_window((0,0), window=table, anchor="nw")
+        
         # Function to update table with current data chunk
         def update_table():
             table.delete(*table.get_children())
             for row in data_chunks[current_chunk]:
-                table.insert('', 'end', values=row)
+                classified_row = classify_vitals(row)
+                table.insert('', 'end', values=classified_row)
+                
+        def classify_vitals(row):
+            bp_sys, bp_dys, temp, hr, ox_r = row[1:6]
+
+            # Classify each vital sign using the provided functions
+            bp_classificationv = bp_classification(bp_sys, bp_dys)
+            temp_classificationv = temp_classification(temp)
+            hr_classificationv = hr_classification(hr)
+            ox_classificationv = ox_classification(ox_r)
+
+            return (row[0], bp_sys, bp_dys, bp_classificationv, temp, temp_classificationv, hr, hr_classificationv, ox_r, ox_classificationv)                
 
         # Functions to handle pagination
         def prev_page():
@@ -537,12 +637,81 @@ def history_page():
                 current_chunk += 1
                 update_table()
 
+
         # Add pagination buttons
         tk.Button(history, text="Prev", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=prev_page).place(x=8, y=440)
         tk.Button(history, text="Next", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=next_page).place(x=250, y=440)
         
-        tk.Button(history, text="Day", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=filter_by_day).place(x=800, y=440)
-        tk.Button(history, text="Week", height=2, width=10, font=("Arial", 14), background="#ee6c4d", command=filter_by_week).place(x=900, y=440)
+        def display_date_range_window():
+            date_range_window = tk.Toplevel(history)
+            date_range_window.title("Select Date Range")
+            date_range_window.resizable(0, 0)
+            date_range_window.configure(background="#0583D2")
+            
+            # Set the size of the window
+            appHeight = 190
+            appWidth = 250
+                    
+            screenHeight = date_range_window.winfo_screenheight()
+            screenWidth = date_range_window.winfo_screenwidth()
+
+            x = (screenHeight / 2) - (appHeight / 2)
+            y = (screenWidth / 2) - (appWidth / 2)
+            date_range_window.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x)}')              
+
+            start_date_label = tk.Label(date_range_window, text="Start Date (DD/MM/YYYY):", background="#0583D2", fg="white", font=("Arial", 12, "bold"))
+            start_date_label.pack()
+            start_date_entry = tk.Entry(date_range_window, font=("Arial", 12))
+            start_date_entry.pack()
+
+            end_date_label = tk.Label(date_range_window, text="End Date (DD/MM/YYYY):", background="#0583D2", fg="white", font=("Arial", 12, "bold"))
+            end_date_label.pack()
+            end_date_entry = tk.Entry(date_range_window, font=("Arial", 12))
+            end_date_entry.pack()
+
+            def display_summary():
+                start_date = start_date_entry.get() + " 00:00:00"
+                end_date = end_date_entry.get() + " 23:59:59"
+                summary_data = generate_summary(start_date, end_date)
+
+                if summary_data:
+                    summary_labels = [
+                        'Min Systolic BP Date', 'Min Systolic BP', 'Max Systolic BP Date', 'Max Systolic BP', 'Avg Systolic BP',
+                        'Min Diastolic BP Date', 'Min Diastolic BP', 'Max Diastolic BP Date', 'Max Diastolic BP', 'Avg Diastolic BP',
+                        'Min Temperature Date', 'Min Temperature', 'Max Temperature Date', 'Max Temperature', 'Avg Temperature',
+                        'Min Heart Rate Date', 'Min Heart Rate', 'Max Heart Rate Date', 'Max Heart Rate', 'Avg Heart Rate',
+                        'Min Oxygen Level Date', 'Min Oxygen Level', 'Max Oxygen Level Date', 'Max Oxygen Level', 'Avg Oxygen Level'
+                    ]
+                    summary = dict(zip(summary_labels, summary_data))
+                    
+                    summary_window = tk.Toplevel(date_range_window)
+                    summary_window.title("Summary")
+                    summary_window.resizable(0, 0)
+                    summary_window.configure(background="#0583D2")
+                    
+                    # Set the size of the window
+                    appHeight = 585
+                    appWidth = 350
+                    
+                    screenHeight = summary_window.winfo_screenheight()
+                    screenWidth = summary_window.winfo_screenwidth()
+
+                    x = (screenHeight / 2) - (appHeight / 2)
+                    y = (screenWidth / 2) - (appWidth / 2)
+                    summary_window.geometry(f'{appWidth}x{appHeight}+{int(y)}+{int(x)}')                    
+
+                    # Display summary data
+                    for label, value in summary.items():
+                        tk.Label(summary_window, text=f"{label}: {value}", anchor='w', background="#0583D2", fg="white", font=("Arial", 12)).pack(fill='x')
+                else:
+                    tk.Label(date_range_window, text="No data available for selected date range.", background="#0583D2", fg="white", font=("Arial", 12)).pack()
+
+            generate_summary_button = tk.Button(date_range_window, text="Generate Summary", height=2, width=15, font=("Arial", 12), background="#ee6c4d", command=display_summary)
+            generate_summary_button.pack(pady=10)        
+
+
+        tk.Button(history, text="Summary", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=display_date_range_window).place(x=860, y=440)
+
 
         # Show first page
         update_table()
@@ -550,8 +719,9 @@ def history_page():
     except:
         messagebox.showwarning("Warning", "History is empty...")
     finally:
-        tk.Button(history, text="BACK", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=120, y=440)
+        tk.Button(history, text="Back", height=2, width=12, font=("Arial", 14), background="#ee6c4d", command=back_to_main).place(x=120, y=440)
 
+        
 def legend_page():
     legend = tk.Tk()
     legend.title("Legend Page")
